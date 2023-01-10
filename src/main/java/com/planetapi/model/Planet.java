@@ -1,4 +1,4 @@
-package com.example.model;
+package com.planetapi.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -44,8 +44,8 @@ public class Planet {
     public Planet() {
     }
 
-    private class PlanetData {
-    }
+    // private class PlanetData {
+    // }
 
     // public Planet(Long id, String name, int population, PlanetData planetData) {
     public Planet(Long id, String name, int population) {
@@ -68,6 +68,19 @@ public class Planet {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getPopulation() {
+        return population;
+    }
+
+    public void setPopulation(int population) {
+        this.population = population;
+    }
+
+    @Override
+    public String toString() {
+        return "Planet [id=" + id + ", name=" + name + ", population=" + population + "]";
     }
 
     // public PlanetData getPlanetData() {

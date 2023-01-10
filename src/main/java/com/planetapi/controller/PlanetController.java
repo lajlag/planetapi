@@ -1,4 +1,4 @@
-package com.example.controller;
+package com.planetapi.controller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,13 +8,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.model.Planet;
-
-import repository.PlanetRepository;
+import com.planetapi.model.Planet;
+import com.planetapi.repository.PlanetRepository;
 
 @CrossOrigin(origins = "http://localhost:8090")
 @RestController
@@ -29,16 +30,29 @@ public class PlanetController {
         try {
             List<Planet> planets = new ArrayList<Planet>();
 
-            if (name == null)
+            if (name == null) {
                 planetRepository.findAll().forEach(planets::add);
-            else
+            } else {
                 planetRepository.findByName(name).forEach(planets::add);
+            }
 
             if (planets.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
 
             return new ResponseEntity<>(planets, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/planets/{name}")
+    public ResponseEntity<Planet> createPlanet(@RequestBody Planet planet) {
+
+        try {
+            Planet _planet = planetRepository
+                    .save(new Planet(planet.getId(), planet.getName(), planet.getPopulation()));
+            return new ResponseEntity<>(_planet, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }

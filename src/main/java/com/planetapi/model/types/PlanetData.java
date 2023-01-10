@@ -1,4 +1,4 @@
-package com.example.model.types;
+package com.planetapi.model.types;
 
 public class PlanetData {
     public enum Climates {

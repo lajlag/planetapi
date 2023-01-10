@@ -19,43 +19,74 @@ public class Planet {
     private String name;
 
     @Column(name = "population")
-    private int population;
+    private Integer population;
 
-    // TODO: relations
-    // residents
-    // films
+    @Column(name = "rotationPeriod")
+    private Integer rotationPeriod;
 
-    // "name": "Yavin IV",
-    // "rotation_period": "24",
-    // "orbital_period": "4818",
-    // "diameter": "10200",
-    // "climate": "temperate, tropical",
-    // "gravity": "1 standard",
-    // "terrain": "jungle, rainforests",
-    // "surface_water": "8",
-    // "population": "1000",
-    // "residents": [],
-    // "films": [
-    // "https://swapi.dev/api/films/1/"
-    // ],
-    // @Column(name = "planetData", )
-    // private PlanetData planetData;
+    @Column(name = "orbitalPeriod")
+    private Integer orbitalPeriod;
+
+    @Column(name = "diameter")
+    private Integer diameter;
+
+    @Column(name = "gravity")
+    private String gravity;
+
+    @Column(name = "climate")
+    // @Enumerated(EnumType.STRING)
+    private String climate;
+
+    @Column(name = "terrain")
+    private String terrain;
+
+    // percentage maybe?
+    @Column(name = "surfaceWater")
+    private Integer surfaceWater;
+
+    public enum Climates {
+        tropical,
+        dry,
+        temperate,
+        continental,
+        polar,
+    }
+
+    // TODO: map terrains to climates
+    // TODO: map terrain subtypes to terrains
+    protected enum Terrains {
+        desert,
+        ice_cap,
+        tundra,
+        rainforests,
+        forests,
+        grasslands,
+        mountains,
+        lakes,
+        swamp,
+    }
 
     public Planet() {
     }
 
-    // private class PlanetData {
-    // }
-
-    // public Planet(Long id, String name, int population, PlanetData planetData) {
-    public Planet(Long id, String name, int population) {
+    // public Planet(Long id, String name, Integer population, PlanetData
+    // planetData) {
+    public Planet(Long id, String name, Integer population,
+            Integer rotation_period, Integer orbital_period, Integer diameter, String gravity,
+            String climate, String terrain, Integer surface_water) {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("Name cannot be null or empty");
         }
         this.id = id;
         this.name = name;
         this.population = population;
-        // this.planetData = planetData;
+        this.rotationPeriod = rotation_period;
+        this.orbitalPeriod = orbital_period;
+        this.diameter = diameter;
+        this.gravity = gravity;
+        this.surfaceWater = surface_water;
+        this.climate = climate;
+        this.terrain = terrain;
     }
 
     public Long getId() {
@@ -70,27 +101,79 @@ public class Planet {
         this.name = name;
     }
 
-    public int getPopulation() {
+    public Integer getPopulation() {
         return population;
     }
 
-    public void setPopulation(int population) {
+    public void setPopulation(Integer population) {
         this.population = population;
     }
 
-    @Override
-    public String toString() {
-        return "Planet [id=" + id + ", name=" + name + ", population=" + population + "]";
+    public Integer getRotationPeriod() {
+        return rotationPeriod;
     }
+
+    public void setRotationPeriod(Integer rotationPeriod) {
+        this.rotationPeriod = rotationPeriod;
+    }
+
+    public Integer getOrbitalPeriod() {
+        return orbitalPeriod;
+    }
+
+    public void setOrbitalPeriod(Integer orbitalPeriod) {
+        this.orbitalPeriod = orbitalPeriod;
+    }
+
+    public Integer getDiameter() {
+        return diameter;
+    }
+
+    public void setDiameter(Integer diameter) {
+        this.diameter = diameter;
+    }
+
+    public String getClimate() {
+        return climate;
+    }
+
+    public void setClimate(String climate) {
+        this.climate = climate;
+    }
+
+    public String getTerrain() {
+        return terrain;
+    }
+
+    public void setTerrain(String terrain) {
+        this.terrain = terrain;
+    }
+
+    public String getGravity() {
+        return gravity;
+    }
+
+    public void setGravity(String gravity) {
+        this.gravity = gravity;
+    }
+
+    public Integer getSurfaceWater() {
+        return surfaceWater;
+    }
+
+    public void setSurfaceWater(Integer surfaceWater) {
+        this.surfaceWater = surfaceWater;
+    }
+    // public void setPlanetData(PlanetData planetData) {
+    // }
 
     // public PlanetData getPlanetData() {
     // return planetData;
     // }
 
-    // public void setPlanetData(PlanetData planetData) {
-    // if (planetData == null) {
-    // throw new IllegalArgumentException("Input object cannot be null");
-    // }
-    // this.planetData = planetData;
+    // @Override
+    // public String toString() {
+    // return "Planet [id=" + id + ", name=" + name + ", population=" + population +
+    // "]";
     // }
 }

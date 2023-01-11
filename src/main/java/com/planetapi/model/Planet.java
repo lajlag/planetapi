@@ -1,13 +1,21 @@
 package com.planetapi.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.planetapi.model.types.PlanetTypes.ClimatesEnum;
+import com.planetapi.model.types.PlanetTypes.TerrainsEnum;
+
 @Entity
+@EntityListeners(PlanetListener.class)
 @Table(name = "planets")
 public class Planet {
 
@@ -34,57 +42,30 @@ public class Planet {
     private String gravity;
 
     @Column(name = "climate")
-    // @Enumerated(EnumType.STRING)
     private String climate;
 
     @Column(name = "terrain")
     private String terrain;
 
-    // percentage maybe?
     @Column(name = "surfaceWater")
     private Integer surfaceWater;
-
-    public enum Climates {
-        tropical,
-        dry,
-        temperate,
-        continental,
-        polar,
-    }
-
-    // TODO: map terrains to climates
-    // TODO: map terrain subtypes to terrains
-    protected enum Terrains {
-        desert,
-        ice_cap,
-        tundra,
-        rainforests,
-        forests,
-        grasslands,
-        mountains,
-        lakes,
-        swamp,
-    }
-
-    public Planet() {
-    }
 
     // public Planet(Long id, String name, Integer population, PlanetData
     // planetData) {
     public Planet(Long id, String name, Integer population,
-            Integer rotation_period, Integer orbital_period, Integer diameter, String gravity,
-            String climate, String terrain, Integer surface_water) {
+            Integer rotationPeriod, Integer orbitalPeriod, Integer diameter, String gravity,
+            String climate, String terrain, Integer surfaceWater) {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("Name cannot be null or empty");
         }
         this.id = id;
         this.name = name;
         this.population = population;
-        this.rotationPeriod = rotation_period;
-        this.orbitalPeriod = orbital_period;
+        this.rotationPeriod = rotationPeriod;
+        this.orbitalPeriod = orbitalPeriod;
         this.diameter = diameter;
         this.gravity = gravity;
-        this.surfaceWater = surface_water;
+        this.surfaceWater = surfaceWater;
         this.climate = climate;
         this.terrain = terrain;
     }
@@ -138,7 +119,19 @@ public class Planet {
     }
 
     public void setClimate(String climate) {
-        this.climate = climate;
+        String[] climates = climate.split(",");
+        List<String> validClimates = new ArrayList<String>();
+
+        for (String c : climates) {
+            String formattedClimate = c.trim().replace(" ", "_");
+            for (ClimatesEnum climateEnum : ClimatesEnum.values()) {
+                if (climateEnum.name().equals(formattedClimate)) {
+                    validClimates.add(climateEnum.name());
+                }
+            }
+        }
+        String climateString = String.join(", ", validClimates);
+        this.climate = climateString;
     }
 
     public String getTerrain() {
@@ -146,7 +139,19 @@ public class Planet {
     }
 
     public void setTerrain(String terrain) {
-        this.terrain = terrain;
+        String[] terrains = terrain.split(",");
+        List<String> validTerrains = new ArrayList<String>();
+
+        for (String t : terrains) {
+            String formattedTerrain = t.trim().replace(" ", "_");
+            for (TerrainsEnum terrainEnum : TerrainsEnum.values()) {
+                if (terrainEnum.name().equals(formattedTerrain)) {
+                    validTerrains.add(terrainEnum.name());
+                }
+            }
+        }
+        String terrainString = String.join(", ", validTerrains);
+        this.terrain = terrainString;
     }
 
     public String getGravity() {
@@ -164,16 +169,4 @@ public class Planet {
     public void setSurfaceWater(Integer surfaceWater) {
         this.surfaceWater = surfaceWater;
     }
-    // public void setPlanetData(PlanetData planetData) {
-    // }
-
-    // public PlanetData getPlanetData() {
-    // return planetData;
-    // }
-
-    // @Override
-    // public String toString() {
-    // return "Planet [id=" + id + ", name=" + name + ", population=" + population +
-    // "]";
-    // }
 }

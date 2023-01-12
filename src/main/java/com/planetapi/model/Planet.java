@@ -17,8 +17,7 @@ import com.planetapi.model.types.PlanetTypes.TerrainsEnum;
 @Entity
 @EntityListeners(PlanetListener.class)
 @Table(name = "planets")
-public class Planet {
-
+public class Planet implements CelestialBodyInterface {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -27,16 +26,16 @@ public class Planet {
     private String name;
 
     @Column(name = "population")
-    private Integer population;
+    private String population;
 
     @Column(name = "rotationPeriod")
-    private Integer rotationPeriod;
+    private Long rotationPeriod;
 
     @Column(name = "orbitalPeriod")
-    private Integer orbitalPeriod;
+    private Long orbitalPeriod;
 
     @Column(name = "diameter")
-    private Integer diameter;
+    private Long diameter;
 
     @Column(name = "gravity")
     private String gravity;
@@ -48,13 +47,24 @@ public class Planet {
     private String terrain;
 
     @Column(name = "surfaceWater")
-    private Integer surfaceWater;
+    private String surfaceWater;
 
-    // public Planet(Long id, String name, Integer population, PlanetData
-    // planetData) {
-    public Planet(Long id, String name, Integer population,
-            Integer rotationPeriod, Integer orbitalPeriod, Integer diameter, String gravity,
-            String climate, String terrain, Integer surfaceWater) {
+    @Column(name = "surfaceArea")
+    private Double surfaceArea;
+
+    public Planet() {
+    }
+
+    public Planet(long diameter) {
+        this.diameter = diameter;
+        this.surfaceArea = calculateSurfaceArea(diameter);
+    }
+
+    // TODO: planet data details should be abstracted to a separate class
+    // and saved as a Jsonb object in db
+    public Planet(Long id, String name, String population,
+            Long rotationPeriod, Long orbitalPeriod, Long diameter, String gravity,
+            String climate, String terrain, String surfaceWater, Double surfaceArea) {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("Name cannot be null or empty");
         }
@@ -78,46 +88,72 @@ public class Planet {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Integer getPopulation() {
+    public String getPopulation() {
         return population;
     }
 
-    public void setPopulation(Integer population) {
-        this.population = population;
-    }
-
-    public Integer getRotationPeriod() {
+    public Long getRotationPeriod() {
         return rotationPeriod;
     }
 
-    public void setRotationPeriod(Integer rotationPeriod) {
-        this.rotationPeriod = rotationPeriod;
-    }
-
-    public Integer getOrbitalPeriod() {
+    public Long getOrbitalPeriod() {
         return orbitalPeriod;
     }
 
-    public void setOrbitalPeriod(Integer orbitalPeriod) {
-        this.orbitalPeriod = orbitalPeriod;
-    }
-
-    public Integer getDiameter() {
+    public Long getDiameter() {
         return diameter;
     }
 
-    public void setDiameter(Integer diameter) {
-        this.diameter = diameter;
+    public String getGravity() {
+        return gravity;
     }
 
     public String getClimate() {
         return climate;
     }
 
+    public String getTerrain() {
+        return terrain;
+    }
+
+    public String getSurfaceWater() {
+        return surfaceWater;
+    }
+
+    public Double getSurfaceArea() {
+        return surfaceArea;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPopulation(String population) {
+        this.population = population;
+    }
+
+    public void setRotationPeriod(Long rotationPeriod) {
+        this.rotationPeriod = rotationPeriod;
+    }
+
+    public void setOrbitalPeriod(Long orbitalPeriod) {
+        this.orbitalPeriod = orbitalPeriod;
+    }
+
+    public void setDiameter(Long diameter) {
+        this.diameter = diameter;
+    }
+
+    public void setGravity(String gravity) {
+        this.gravity = gravity;
+    }
+
+    public void setSurfaceWater(String surfaceWater) {
+        this.surfaceWater = surfaceWater;
+    }
+
+    // TODO: this method and setTerrain should be refactored in order to
+    // avoid code duplication
     public void setClimate(String climate) {
         String[] climates = climate.split(",");
         List<String> validClimates = new ArrayList<String>();
@@ -132,10 +168,6 @@ public class Planet {
         }
         String climateString = String.join(", ", validClimates);
         this.climate = climateString;
-    }
-
-    public String getTerrain() {
-        return terrain;
     }
 
     public void setTerrain(String terrain) {
@@ -154,19 +186,16 @@ public class Planet {
         this.terrain = terrainString;
     }
 
-    public String getGravity() {
-        return gravity;
+    public void setSurfaceArea(Long diameter) {
+        this.surfaceArea = calculateSurfaceArea(diameter);
     }
 
-    public void setGravity(String gravity) {
-        this.gravity = gravity;
-    }
+    public Double calculateSurfaceArea(Long diameter) {
+        if (diameter < 0) {
+            throw new IllegalArgumentException("Diameter cannot be negative");
+        }
+        double surfaceArea = (4 * Math.PI * Math.pow(diameter / 2, 2));
 
-    public Integer getSurfaceWater() {
-        return surfaceWater;
-    }
-
-    public void setSurfaceWater(Integer surfaceWater) {
-        this.surfaceWater = surfaceWater;
+        return Math.floor(surfaceArea);
     }
 }

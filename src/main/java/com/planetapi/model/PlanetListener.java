@@ -9,5 +9,6 @@ public class PlanetListener {
     public void checkPlanetProperties(Planet planet) {
         planet.setTerrain(planet.getTerrain().toLowerCase());
         planet.setClimate(planet.getClimate().toLowerCase());
+        planet.setSurfaceArea(planet.getDiameter());
     }
 }

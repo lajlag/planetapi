@@ -15,10 +15,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+// import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.planetapi.model.Planet;
+import com.planetapi.model.PlanetApiModel;
 import com.planetapi.repository.PlanetRepository;
+import com.planetapi.service.PlanetService;
+
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -32,11 +36,20 @@ public class PlanetController {
     @Autowired
     PlanetRepository planetRepository;
 
+    @Autowired
+    private PlanetService planetService;
+
     @GetMapping("/planets")
+    // public ResponseEntity<List<Planet>> getAllPlanets(@RequestParam(required =
+    // false) String name) {
     public ResponseEntity<List<Planet>> getAllPlanets() {
         try {
             List<Planet> planets = new ArrayList<Planet>();
+            // if (name == null) {
             planetRepository.findAll().forEach(planets::add);
+            // } else {
+            // planetRepository.findByNameContaining(name.toLowerCase()).forEach(planets::add);
+            // }
 
             if (planets.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -62,11 +75,12 @@ public class PlanetController {
     @PostMapping("/planets")
     public ResponseEntity<Planet> createPlanet(@RequestBody Planet planet) {
         try {
-            Planet _planet = planetRepository
+            Planet newPlanetEntity = planetRepository
                     .save(new Planet(planet.getId(), planet.getName(), planet.getPopulation(),
                             planet.getRotationPeriod(), planet.getOrbitalPeriod(), planet.getDiameter(),
-                            planet.getGravity(), planet.getClimate(), planet.getTerrain(), planet.getSurfaceWater()));
-            return new ResponseEntity<>(_planet, HttpStatus.CREATED);
+                            planet.getGravity(), planet.getClimate(), planet.getTerrain(), planet.getSurfaceWater(),
+                            planet.getSurfaceArea()));
+            return new ResponseEntity<>(newPlanetEntity, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -76,37 +90,38 @@ public class PlanetController {
     public ResponseEntity<Planet> updatePlanet(@PathVariable("id") Long id, @RequestBody Planet planet) {
         Optional<Planet> planetData = planetRepository.findById(id);
 
+        // Planet entity details should be abstracted away
         if (planetData.isPresent()) {
-            Planet _planet = planetData.get();
+            Planet planetEntity = planetData.get();
             if (planet.getName() != null) {
-                _planet.setName(planet.getName());
+                planetEntity.setName(planet.getName());
             }
             if (planet.getPopulation() != null) {
-                _planet.setPopulation(planet.getPopulation());
+                planetEntity.setPopulation(planet.getPopulation());
             }
             if (planet.getRotationPeriod() != null) {
-                _planet.setRotationPeriod(planet.getRotationPeriod());
+                planetEntity.setRotationPeriod(planet.getRotationPeriod());
             }
             if (planet.getOrbitalPeriod() != null) {
-                _planet.setOrbitalPeriod(planet.getOrbitalPeriod());
+                planetEntity.setOrbitalPeriod(planet.getOrbitalPeriod());
             }
             if (planet.getDiameter() != null) {
-                _planet.setDiameter(planet.getDiameter());
+                planetEntity.setDiameter(planet.getDiameter());
             }
             if (planet.getClimate() != null) {
-                _planet.setClimate(planet.getClimate());
+                planetEntity.setClimate(planet.getClimate());
             }
             if (planet.getTerrain() != null) {
-                _planet.setTerrain(planet.getTerrain());
+                planetEntity.setTerrain(planet.getTerrain());
             }
             if (planet.getGravity() != null) {
-                _planet.setGravity(planet.getGravity());
+                planetEntity.setGravity(planet.getGravity());
             }
             if (planet.getSurfaceWater() != null) {
-                _planet.setSurfaceWater(planet.getSurfaceWater());
+                planetEntity.setSurfaceWater(planet.getSurfaceWater());
             }
 
-            return new ResponseEntity<Planet>(planetRepository.save(_planet), HttpStatus.OK);
+            return new ResponseEntity<Planet>(planetRepository.save(planetEntity), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -118,8 +133,28 @@ public class PlanetController {
             planetRepository.deleteById(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
-            logger.error("Error occurred", e);
+            logger.error("Error occurred when deleting db entity", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    // #region Endpoint for calling external API and saving to DB
+    @GetMapping("/planets/external")
+    public List<PlanetApiModel> getAllStarWarsPlanets() {
+        List<PlanetApiModel> planets = planetService.findAllStarWarsPlanets();
+
+        return planets;
+    }
+
+    @GetMapping("/planets/populate-db")
+    public ResponseEntity<HttpStatus> populateDb() {
+        try {
+            planetService.saveAllStarWarsPlanets();
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error("Error occurred when populating db", e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    // #endregion
 }
